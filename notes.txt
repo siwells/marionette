@@ -1,0 +1,79 @@
+PLAN
+====
+
+Retrieve base ova
+    (1) Puppetmaster: for generating new VMs, including glovepuppets, from scratch
+    (2) Glovepuppet: basic ova containing ssh key that can be loaded with install scripts via scp/ssh ready for provisioning
+Prerequisites:
+    (1) VirtualBox
+    (2) Marionette -- from git
+
+Use the puppetmaster to create a new VM from scratch -- vmbuilder
+Use a glovepuppet to provision from an existing ova
+Use the puppetmaster to provision an updated puppetmaster
+
+PROCEDURE :: Puppetmaster Setup
+===============================
+
+TODO: Rebuild Puppetmaster using Ubuntu
+
+NB. On Debian & Ubuntu, glovepuppets can be provisioned directly using vmbuilder but on OS X the puppetmaster OVA is required to enable the VM provisioning system to be bootstrapped.
+
+NB. Should really be a script
+create base vm
+
+install virtualbox guest additions
+        $ apt-get update
+        $ apt-get upgrade
+
+        $ apt-get install sudo
+        $ apt-get install vim
+
+    Add user to /etc/sudoers
+    log out of root
+    log in as user
+
+    Prerequisites:
+        $ sudo apt-get install build-essential
+        $ sudo apt-get install linux-headers-`uname -r`
+
+        $ sudo mount /media/cdrom
+
+    remove existing
+        $ sudo dpkg -l | grep virtualbox
+
+e.g.    $ sudo apt-get remove --purge virtualbox-ose-guest-dkms
+e.g.    $ sudo apt-get remove --purge virtualbox-ose-guest-utils
+
+    install latest
+        $ cd /media/cdrom
+        $ sudo sh ./VboxLinuxAdditions.run
+        $ reboot
+
+TEST: From host:
+e.g.    $ VBoxManage --nologo guestcontrol "base" execute --image "/bin/ls" --username "simon" --password "storm" --wait-exit --wait-stdout
+
+
+        $ sudo apt-get install git
+        XXX$ git clone git://git.debian.org/git/pkg-escience/vmbuilder.git
+        $ wget https://launchpad.net/ubuntu/+source/vm-builder/0.12.4+bzr469-0ubuntu1
+        $ sudo apt-get install python
+        $ sudo apt-get install qemu
+
+  Depends: debootstrap (>= 1.0.9)
+  Depends: kpartx
+  Depends: parted
+  Depends: python (>= 2.5)
+  Depends: python-central (>= 0.6.11)
+  Depends: python-cheetah
+  Depends: qemu-kvm
+  Depends: qemu-kvm-extras
+  Depends: rsync
+  Depends: ubuntu-keyring
+
+
+sudo ./vmbuilder kvm ubuntu --arch 'i386' --rootsize '4096' --kernel-flavour 'server' --components 'main,universe' --user 'simon' --pass 'storm' -v --debug
+
+convert qcow2 to virtualbox
+create virtualbox vm
+start machine
